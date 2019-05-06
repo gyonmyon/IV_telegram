@@ -1,0 +1,179 @@
+~version: "2.1"
+
+#TITLE
+title: //h1
+subtitle: //p[@itemprop="description"]
+
+#BODY
+body: //div[@class="article_body"]
+body: //section[@class="grid"]
+
+###PAGINATION-PREV###
+<iframe>: //li[has-class("pagination_previous")]//a
+@set_attr(src, @href): $$
+@inline: //li[has-class("pagination_previous")]//iframe
+ $prev: $@ 
+ @remove: $prev
+ @prepend_to($body): $prev//div[@class="article_body"]
+
+@while( $prev ) {
+@prepend_to($body): $prev//li[has-class("pagination_previous")]
+    <iframe>: //li[has-class("pagination_previous")]//a
+@set_attr(src, @href): $$
+@inline: //li[has-class("pagination_previous")]//iframe
+ $prev: $@ 
+ @remove: $prev
+ @prepend_to($body): $prev//div[@class="article_body"]
+}
+                      ###Pagination-ends
+                          
+###PAGINATION-NEXT
+        <iframe>: //li[has-class("pagination_next")]//a
+@set_attr(src, @href): $$
+@inline: //li[has-class("pagination_next")]//iframe
+ $inlined: $@ 
+ ####-1
+ @remove: $inlined
+ @append_to($body): $inlined//div[@class="article_body"]
+ 
+###while
+ @while( $inlined ) {
+  @append_to($body): $inlined//li[has-class("pagination_next")]
+            <iframe>: //li[has-class("pagination_next")]//a
+@set_attr(src, @href): $$
+@inline: //li[has-class("pagination_next")]//iframe
+ $inlined: $@ 
+ @remove: $inlined
+ @append_to($body): $inlined//div[@class="article_body"]
+ }
+                           ###Pagination-ends 
+                               
+                   ###PAGINATION-NEXT-button
+<iframe>: //li//a[has-class("add-margin-right")]
+    @set_attr(src, @href): $$
+@replace("/en/" "https://www.auto123.com/en/"): $@
+@inline: //iframe[has-class("button_primary")]
+ $inlined: $@ 
+ ####-1
+ @remove: $inlined
+ @append_to($body): $inlined//div[@class="article_body"]
+ 
+###while
+ @while( $inlined ) {
+ @append_to($body): $inlined//a[@class="button_primary button button_icon button_arrow_right add-margin-right"]
+                    <iframe>: $@
+@set_attr(src, @href): $$
+@replace("/en/" "https://www.auto123.com/en/"): $@
+@inline: //iframe[has-class("button_primary")]
+ $inlined: $@ 
+ ####-1
+ @remove: $inlined
+ @append_to($body): $inlined//div[@class="article_body"]
+ }
+                                  ##########
+                            ###PAGINATION-PREV-button
+@prepend_to($body): //a[has-class("button_arrow_left")]
+                        <iframe>: $@
+@set_attr(src, @href): $$
+@replace("/en/" "https://www.auto123.com/en/"): $@
+@inline: //iframe[has-class("button_primary")]
+ $inlined: $@ 
+ ####-1
+ @remove: $inlined
+ @prepend_to($body): $inlined//div[@class="article_body"]
+ 
+ ###while
+ @while( $inlined ) {
+ @prepend_to($body):  $inlined//a[has-class("button_arrow_left")]
+                            <iframe>: $@
+@set_attr(src, @href): $$
+@replace("/en/" "https://www.auto123.com/en/"): $@
+@inline: //iframe[has-class("button_primary")]
+ $inlined: $@ 
+ @remove: $inlined
+ @prepend_to($body): $inlined//div[@class="article_body"]
+ }
+ 
+#COVER
+                                <figure>: //div[@itemprop="image"]
+cover: $$
+
+#DATE
+
+#AUTHIRS
+author: //span[@itemprop="author"]
+author: //a[@class="username"]
+    author_url: $author/@href
+
+#MEDIA
+@after(<br>): //blockquote//p/prev-sibling::p
+
+                                    <figure>: //div[has-class("add-margin-left")]
+    @before_el("./../self::figure"): //p
+                                        <figure>: //li[@itemprop="associatedMedia"]
+@replace("scaledown=280" "jpg"): //img/@src
+
+                                            <slideshow>: //section[@class="block_add_img"]
+
+@detach: //img/@href
+  @remove: $@
+
+@after_el("./../self::div"): //div[./a[has-class("button_primary")]]
+@after_el("./../self::slideshow"): //div[./a[has-class("button_primary")]]
+
+<figcaption>: //div[has-class("photo_text")]
+    <cite>: //div[has-class("photo_credit")]
+
+@remove: //ul[has-class("call-to-action-links")]
+@remove: //div[has-class("span_12_of_12")]
+@remove: //div[has-class("calls_action_container")]
+@remove: //div[@class="fb-comments"]
+@remove: //a[has-class("arrow_right_white")]
+@remove: //section[./h2[@class="add-margin-bottom"]]
+@remove: //script[@data-type="text/javascript"]
+
+@match("(?<=id:\").+?(?=\")"): //script
+  $youtube: $@/text()
+<figure>: //div[has-class("video_responsive")]
+@after(<iframe>): $body//figure[has-class("video_responsive")]//script
+@set_attr(src, $youtube): $@
+@replace("video-" "https://youtube.com/watch?v="): $@
+
+<div>: //figure[.//blockquote]   
+<pic>: //table//img
+
+#RELATED
+@append_to($body): //div[@class="listing_plus wrapper_box_gray_mobile"]
+  <related>: $@
+@append_to("//related"):  //div[has-class("add-margin-bottom")]//h2[@class="title_3 title_line_up"]
+
+<related>: //div[@class="grid__item"][.//a[has-class("btn_gallery")]][not(.//img)]
+  @before_el("./../self::a"): //div
+    @remove: //a[@itemprop="contentURL"]
+  @detach: //img/@alt
+    @remove: $@
+
+@wrap(<combine>): //related
+  @combine: //combine[prev-sibling::combine] 
+  <related>: //combine
+
+
+#LINK PREVIEW
+description: $subtitle
+site_name: "Auto123.com"
+  
+$problems: $body
+@while( $problems ) {
+  $test: $body//*[self::blockquote or self::aside or self::figure or (self::img and not(./ancestor::figure)) or self::iframe or self::slideshow or self::related or self::footer or self::table[not(ancestor::table) and not(descendant::table)]]
+ 
+  $problems: $test/self::*[ancestor::anchor or ancestor::blockquote or ancestor::aside or ancestor::footer or ancestor::strong or ancestor::b or ancestor::em or ancestor::i or ancestor::ins or ancestor::u or ancestor::del or ancestor::s or ancestor::strike or ancestor::code or ancestor::kbd or ancestor::samp or ancestor::tt or ancestor::mark or ancestor::sup or ancestor::pic or ancestor::sub or ancestor::a or ancestor::reference or ancestor::h1 or ancestor::h2 or ancestor::h3 or ancestor::h4 or ancestor::h5 or ancestor::h6 or ancestor::p or ancestor::pre or ancestor::hr or ancestor::img or ancestor::br]
+ 
+  @if( $problems ) {
+    $parent: $problems/parent::*
+    @detach: $parent/node()
+    @set_attr("merge", $index): $@
+    <remove>: $parent
+    @after_el("./parent::*"): $problems
+    @combine: $body//self::*[prev-sibling::*/@merge = @merge]
+  }
+}
