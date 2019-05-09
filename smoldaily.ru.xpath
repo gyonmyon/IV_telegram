@@ -1,0 +1,48 @@
+~version: "2.1"
+
+#TITLE
+title: //div[@class="title"]
+
+#BODY
+$body: //div[@class="post-one mainpost"]
+    body: $body
+
+@append_to($body): //p[starts-with(text(),"Текст")]
+
+#COVER
+<figcaption>: //p[@class="wp-caption-text"]
+    <figure>: //div[@class="wp-caption alignleft"]
+        cover: $@
+cover: //p[@class="post-one mainpost"]//img
+cover: //img[has-class("alignleft")]
+
+#DATE
+published_date: //p[@class="date date-with-ya-share2"]
+
+#AUTHORS
+author: //p[starts-with(text(),"Текст")]/text()
+    @replace("Текст:" ""): //p[starts-with(text(),"Текст")]/text()
+    @replace("Текст и фото:" ""): //p[starts-with(text(),"Текст")]/text()
+
+#MEDIA
+<slideshow>: //div[@class="fotorama"]
+
+#LINKPREVIEW
+description: //meta[@property="og:description"]/@content
+@unsupported: //iframe[@class="wp-embedded-content"]
+
+$problems: $body
+@while( $problems ) {
+  $test: $body//*[self::blockquote or self::aside or self::figure or (self::img and not(./ancestor::figure)) or self::iframe or self::slideshow or self::related or self::footer or self::table[not(ancestor::table) and not(descendant::table)]]
+ 
+  $problems: $test/self::*[ancestor::anchor or ancestor::blockquote or ancestor::aside or ancestor::footer or ancestor::strong or ancestor::b or ancestor::em or ancestor::i or ancestor::ins or ancestor::u or ancestor::del or ancestor::s or ancestor::strike or ancestor::code or ancestor::kbd or ancestor::samp or ancestor::tt or ancestor::mark or ancestor::sup or ancestor::pic or ancestor::sub or ancestor::a or ancestor::reference or ancestor::h1 or ancestor::h2 or ancestor::h3 or ancestor::h4 or ancestor::h5 or ancestor::h6 or ancestor::p or ancestor::pre or ancestor::hr or ancestor::img or ancestor::br]
+ 
+  @if( $problems ) {
+    $parent: $problems/parent::*
+    @detach: $parent/node()
+    @set_attr("merge", $index): $@
+    <remove>: $parent
+    @after_el("./parent::*"): $problems
+    @combine: $body//self::*[prev-sibling::*/@merge = @merge]
+  }
+}
