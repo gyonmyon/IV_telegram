@@ -15,3 +15,8 @@ Instant view Telegram contest 2019
 
 [Contest](https://instantview.telegram.org/contest/horseracingnation.com/winner2019) |
 [XPath Rule](horseracingnation.com.xpath)
+
+## <http://newdaynews.ru/>
+
+[Contest](https://instantview.telegram.org/contest/newdaynews.ru/winner2019) |
+[XPath Rule](newdaynews.ru.xpath)

@@ -1,0 +1,29 @@
+~version: "2.1"
+
+#TITLE
+title: //meta[@property="og:title"]/@content
+
+#BODY
+body: //div[@itemprop="articleBody"]
+
+#COVER
+cover: //figure[@class="mod-pic"]
+
+#DATE
+@datetime(-3 "ru_RU" "yyyy-MM-dd'T'kk:mm:ss'Z'"): //meta[@property="article:published_time"]/@content
+published_date: $@
+
+#MEDIA
+<slideshow>: //div[@class="afo-fr"]
+@remove: //div[@class="afo-fr-list--blk"]
+
+#RELATED
+<related>: //section[@class="afo-hlink"]
+    @append_to($body): $@
+
+#LINK PREVIEW
+description: //meta[@property="description"]/@content
+
+@remove: //p[@class="ta_center clred2"]
+@remove: //p[.//a[.//b[contains(text(),"Читать дальше")]]]
+@remove: //h2[contains(text(),"Другие новости")]
