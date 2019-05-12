@@ -1,0 +1,69 @@
+~version: "2.1"
+
+#TITLE
+title: //h1[@class="art_name"]
+
+#BODY
+body: //div[@class="art_text "]
+
+body: //div[@class="art_text art_comp"]
+body: //div[@class="art_text art_person"]
+
+#COVER
+cover: //img[@class="img_comp"]
+
+#DATE
+published_date: //time/@datetime
+
+#AUTHORS
+<figcaption>: //div[@class="art_autor_blog"]/a
+<figure>: //div[@class="art_autor_blog"]
+    @before_el("./../self::figcaption"): //img
+#<figcaption>: //figure[@class="art_autor_blog"]//
+
+author: //span[@class="art_autor"]/a
+    author_url: $author/a/@href
+
+author: //figure[@class="art_autor_blog"]//img/@alt
+    author_url: $author//figcaption/@href
+
+<pic>: //div[@class="art_autor_news"]//img
+
+author: //div[@class="art_autor_news"]//a
+@remove: //div[@class="art_autor_news"]//a
+
+#MEDIA
+<pic>: //td//img
+@replace("\\s"," "): //text()
+
+@remove: //a[@class="gtm"]
+
+#RELATED
+$rel: //div[@class="topic_art"]
+    <h2>: //div[@class="topic_r footer_art_list"]//a
+    @prepend_to($rel): //div[@class="topic_r footer_art_list"]//h2
+
+<related>: $rel
+    @append_to($body): $@
+<a>: //div[@class="small "]/div
+
+#LINK PREVIEW
+description: //meta[@name="description"]/@content
+image_url: $cover
+image_url: $body//img/@src
+
+site_name: "ПроАгро"
+
+?true
+$problems: $body
+@while( $problems ) {
+  $test: $body//*[self::audio or self::video or self::blockquote or self::aside or self::figure or (self::img and not(./ancestor::figure)) or self::iframe or self::slideshow or  self::related or self::footer or self::table[not(ancestor::table) and not(descendant::table)]]
+ 
+  $problems: $test/self::*[ancestor::anchor or ancestor::blockquote or ancestor::aside or ancestor::footer or ancestor::strong or ancestor::b or ancestor::em or ancestor::i or ancestor::ins or ancestor::u or ancestor::del or ancestor::s or ancestor::strike or ancestor::code or ancestor::kbd or ancestor::samp or ancestor::tt or ancestor::mark or ancestor::sup or ancestor::pic or ancestor::sub or ancestor::a or ancestor::reference or ancestor::h1 or ancestor::h2 or ancestor::h3 or ancestor::h4 or ancestor::h5 or ancestor::h6 or ancestor::p or ancestor::pre or ancestor::hr or ancestor::img or ancestor::br]
+ 
+  @split_parent: $problems
+}
+
+!not_exists: $body//img[@height="30"]
+image_url: $body//img[contains(@src, "jpg")]/@src
+image_url: $body//img[contains(@src, "jpg")]/@src

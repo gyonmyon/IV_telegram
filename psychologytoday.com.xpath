@@ -15,7 +15,7 @@ body: //div[has-class("field-name-body field-type-text-with-summary field-label-
     <cite>: //div[@class="subtext insertArea--origin"]
 <figure>: //div[@class="insert-inner"]
 
-#AUTHIRS
+#AUTHORS
 author: //h3[@class="profile_card__profile-name"]/a/text()
   author_url: //h3[@class="profile_card__profile-name"]/a/@href
 

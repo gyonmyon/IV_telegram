@@ -24,7 +24,7 @@ published_date: $@
 @datetime: //div[@class="sb-3"]
   published_date: $@
 
-#AUTHIRS
+#AUTHORS
 author: //div[@class="post-author"]//a
 author: //div[@class="post-author"]
 author: //div[@class="sb-1"]

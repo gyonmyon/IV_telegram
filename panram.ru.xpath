@@ -1,0 +1,53 @@
+~version: "2.1"
+
+#TITLE
+title: //h1
+subtitle: //div[has-class("panel-body__shorttext")]
+
+#BODY
+body: //div[@class="panel-body__text"]
+
+#COVER
+cover: //div[@class="panel__picture"]//figure
+
+#DATE
+@replace("сегодня" "today"): //div[has-class("likes__item--date")]
+@replace("минут назад" "minutes ago"): //div[has-class("likes__item--date")]
+@replace("позавчера" "2 days ago"): //div[has-class("likes__item--date")]
+#@replace("дней назад" "days ago"): //div[has-class("likes__item--date")]
+@replace("вчера" "yesterday"): //div[has-class("likes__item--date")]
+    @datetime: //div[has-class("likes__item--date")]
+published_date: $@
+
+#AUTHIRS
+author: $body//p[./strong[contains(text(), "Автор:")]]
+    @remove: $author/strong
+    @remove: $author
+author_url: $author/@href
+  author_url: $author/a/@href
+
+#MEDIA
+ @detach: //img/@href
+  @remove: $@
+
+<p>: //br
+@append_to($body): //div[@class="panel__video"]
+
+#LINK PREVIEW
+description: //meta[@property="og:description"]/@content[normalize-space()]
+description: //meta[@name="description"]/@content
+description: //meta[@name="twitter:description"]/@content[normalize-space()]
+description: $body/p[normalize-space()]
+description: //meta[@name="description"]/@content[normalize-space()]
+@replace("<br />" ""): $description
+site_name: "Панорама"
+
+?true
+$problems: $body
+@while( $problems ) {
+  $test: $body//*[self::audio or self::video or self::blockquote or self::aside or self::figure or (self::img and not(./ancestor::figure)) or self::iframe or self::slideshow or  self::related or self::footer or self::table[not(ancestor::table) and not(descendant::table)]]
+ 
+  $problems: $test/self::*[ancestor::anchor or ancestor::blockquote or ancestor::aside or ancestor::footer or ancestor::strong or ancestor::b or ancestor::em or ancestor::i or ancestor::ins or ancestor::u or ancestor::del or ancestor::s or ancestor::strike or ancestor::code or ancestor::kbd or ancestor::samp or ancestor::tt or ancestor::mark or ancestor::sup or ancestor::pic or ancestor::sub or ancestor::a or ancestor::reference or ancestor::h1 or ancestor::h2 or ancestor::h3 or ancestor::h4 or ancestor::h5 or ancestor::h6 or ancestor::p or ancestor::pre or ancestor::hr or ancestor::img or ancestor::br]
+ 
+  @split_parent: $problems
+}

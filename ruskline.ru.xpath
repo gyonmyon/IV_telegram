@@ -1,0 +1,101 @@
+~version: "2.1"
+?path: /.+
+!path_not: /contacts
+!path_not: /policy
+!path_not: /advertising
+!path_not: /about
+!path_not: /about/.+
+!path_not: /rss
+!path_not: /author/
+!path_not: /author/.+
+?exists: $body
+!not_exists: //div[@class="filtres"]
+!not_exists: //div[@class="list-art"]
+
+#TITLE
+title: //h1
+subtitle: //div[@class="block"]/p/em
+
+#BODY
+body: //div[@class="block"]
+body: //div[@class="content-news"]
+
+#DATE
+@match("[0-9]+.[0-9]+.[0-9]+.")://p[@align="right"]
+@datetime(0 "ru_RU" "dd.MM.yyyy"): $@
+    published_date: $@
+@datetime: //span[@class="date"]
+    published_date: $@
+
+
+#AUTHIRS
+author: //span[@class="avtorname"]
+@remove: $$
+@replace(", " " "): $author
+author_url: $author/@href
+  author_url: $author/a/@href
+  @remove: //p[@align="right"]
+
+#MEDIA
+@detach: //img/@href
+  @remove: $@
+
+@remove: //div[@class="fblikedown"]
+@remove: //div[@class="print-icons"]
+@remove: //a[@onclick="javascript:scrollTo(0,0)"]
+@remove: //div[@class="break"]
+@remove: //div[@class="vklikedown"]
+@remove: //div[@class="maillikedown"]
+@remove: //div[@id="ya_share1"]
+@remove: //iframe[@id="qiwiIframeName"]
+@remove: //div[@style="margin:0 auto; padding:5px; width:550px; border:1px solid #ddd; background:#fff; border-radius: 7px; -webkit-border-radius: 7px; -moz-border-radius: 7px; font:normal 14px/14px Geneva,Verdana,Arial,Helvetica,Tahoma,sans-serif;"]
+@remove: //form
+@remove: //div[@class="error"]
+@remove: //div[@class="comments"]
+@remove: //div[@class="twidown"]
+@remove: //div[@style="margin-top: 7px;"]
+@remove: //hr
+@remove: //p[@class="uplink"]
+
+
+<iframe>: //embed
+@after_el("./../self::object"): //iframe
+@remove: //object
+@replace("/v/" "/embed/"): //iframe/@src
+
+#RELATED
+<related>: //div[@id="related_news"]
+<h3>: //related//strong
+
+#LINK PREVIEW
+description: $subtitle[string-length(text())>1]
+description: $body//p[.//em][normalize-space()][string-length(text())>1]
+
+description: $body//p[normalize-space()][not [./a]]
+
+<p>: //br
+description: $body//div[@class="content-news"]/p/text()
+
+@replace("&laquo;" "«"): $description/text()
+@replace("&raquo;" "»"): $description/text()
+@replace("&amp; " "&"): $description/text()
+@replace("&ndash;" "-"): $description/text()
+@replace("&nbsp" " "): $description/text()
+
+site_name:"Русская народная линия"
+
+image_url: $cover/img/@src
+image_url: $body//img/@src
+document_url: $body//img/@src
+image_url: //meta[@name="twitter:image"]/@content[normalize-space()]
+image_url: //meta[@name="og:image"]/@content[normalize-space()]
+
+?true
+$problems: $body
+@while( $problems ) {
+  $test: $body//*[self::audio or self::video or self::blockquote or self::aside or self::figure or (self::img and not(./ancestor::figure)) or self::iframe or self::slideshow or  self::related or self::footer or self::table[not(ancestor::table) and not(descendant::table)]]
+ 
+  $problems: $test/self::*[ancestor::anchor or ancestor::blockquote or ancestor::aside or ancestor::footer or ancestor::strong or ancestor::b or ancestor::em or ancestor::i or ancestor::ins or ancestor::u or ancestor::del or ancestor::s or ancestor::strike or ancestor::code or ancestor::kbd or ancestor::samp or ancestor::tt or ancestor::mark or ancestor::sup or ancestor::pic or ancestor::sub or ancestor::a or ancestor::reference or ancestor::h1 or ancestor::h2 or ancestor::h3 or ancestor::h4 or ancestor::h5 or ancestor::h6 or ancestor::p or ancestor::pre or ancestor::hr or ancestor::img or ancestor::br]
+ 
+  @split_parent: $problems
+}

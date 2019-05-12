@@ -1,0 +1,158 @@
+~version: "2.1"
+?path: /.+
+!path_not: /contacts
+!path_not: /policy
+!path_not: /advertising
+!path_not: /about
+!path_not: /rss
+!path_not: /policy
+
+#TITLE
+title: //h1
+subtitle: //h3[@class="news-detail__subtitle"]
+subtitle: //h2[@class="subtitle"]
+subtitle: //div[has-class("news-detail__subtitle")]
+
+#BODY
+body: //article[has-class("article")]
+body: //div[@class="inner-post-text"]
+
+#COVER
+<figcaption>: //div[@class="article__img-caption"]
+<figure>: //div[@class="article__img"]
+    cover: $$
+
+#DATE
+@datetime: //div[@class="news-detail__date"]
+    published_date: 
+@datetime: //div[@class="inner-post-date"]
+    published_date: $@
+
+#AUTHIRS
+author: //div[@class="news-detail__author"]//a
+author: //div[@class="inner-post-author"]
+    author_url: $author/@href
+    author_url: $author/a/@href
+  
+#MEDIA
+<h4>: //p[.//span[@class="subtitle"]]
+
+@wrap(<aside>): //table[@style="border: 2px solid ; color: #bababa;"]//td[@align="center"]//img
+
+<slideshow>: //div[@class="ba-slider"]
+@after(<hr>): //table[@style="border: 2px solid ; color: #bababa;"]
+@before(<hr>): //table[@style="border: 2px solid ; color: #bababa;"]
+<div>: //table[.//table]
+
+<aside>: //p[@class="quote_new"]
+<blockquote>: //span[@class="quote_new"]
+
+ @detach: //img/@href
+  @remove: $@
+
+<pic>: //td//img
+
+@append_to($body): //div[has-class("inner-post-slider")]
+
+<figure>: //div[has-class("inner-post-slider")]//li
+<slideshow>: //div[has-class("inner-post-slider")]
+<figcaption>: //div[@class="inner-post-slider-title"]
+
+@combine: //table/next-sibling::table
+
+@remove: //div[@class="inner-post-item-img"]
+@remove: //div[has-class("result-msg")]
+@remove: //div[has-class("vrez-forum")]
+@remove: //div[has-class("js-training-tabs")]
+@remove: //div[has-class("js-training-cert-img")]
+@remove: //div[has-class("mc-container")]
+@remove: //div[has-class("js-training-cert-form")]
+@remove: //div[has-class("js-training-l3-done")]
+@remove: //ul[@class="tabs__list"]
+
+<details>: //div[has-class("article__finalists--last")]
+    <summary>: //details//a[has-class("article__finalists-link")]
+<details>: //div[@class="tabs__content"]
+    <summary>: //details//div[@class="tabs__header"]
+    @remove: //div[@class="social-block"]
+    @remove: //div[@id="mc-container"]
+    @remove: //h3[@class="main-title"]
+
+$vkposts: $body//div[starts-with(@id, "vk_post")]
+@map($vkposts){
+  $post: $@
+  @set_attr("c", "1")
+
+  $script: //script[contains(text(), //div[@c="1"]/@id)]
+  @replace("\\s*\\n\\s*", "")
+  @replace("^.+\\(\\\"vk_post_-?\\d+_\\d+\\\",\\s*(-?\\d+),\\s*(\\d+),\\s*'(\\w+)'\\).+$", "https://vk.com/widget_post.php?owner_id=$1&post_id=$2&hash=$3")
+  @set_attr("src", $script/text()): $post
+  <iframe>
+
+@debug: $body
+  @set_attr("c", ""): $post
+}
+
+<blockquote>: //div[has-class("inner-post-item-text")]//div[@class="inner-post-item-title"]
+
+@set_attr(href, "./ancestor::a/@href"): //p//img[ancestor::a]
+
+#RELATED
+<a>: //div[has-class("article-in-article")]
+@set_attr(href, @onclick): $@
+@replace("window.open\\('" " "): //a[has-class("article-in-article")]/@href
+@replace("', '_blank'\\);" ""): //a[has-class("article-in-article")]/@href
+
+@wrap(<div>): //a[has-class("article-in-article")]
+<related>: //div[./a[has-class("article-in-article")]]
+
+#FOOTER
+@append_to($body): //div[@class="social_info"]
+<footer>: $@
+
+#LINK PREVIEW
+
+image_url: $cover/img/@src
+image_url: //meta[@name="twitter:image"]/@content[normalize-space()]
+image_url: //meta[@name="og:image"]/@content[normalize-space()]
+image_url: //meta[@property="og:image"]/@content[normalize-space()]
+image_url: $body//img/@src
+
+?path: /hotline/.+
+site_name:"hotLine.travel"
+description: //meta[@property="og:description"]/@content[normalize-space()]
+description: $subtitle
+channel: "@HotLineTravel"
+
+?true
+channel: "@tourdom"
+site_name: "TourDom.ru"
+@replace("&laquo;" "«"): $description
+@replace("&raquo;" "»"): $description
+@replace("&amp; " "&"): $description
+@replace("&ndash;" "-"): $description
+@replace("&nbsp" " "): $description
+
+description: $body/p[normalize-space()][not(descendant::b)]
+?path: /class/training/.+
+@prepend_to($body): //div[has-class("news-detail__date")]
+<b>: $@
+
+?true: 
+$problems: $body
+@while( $problems ) {
+  $test: $body//*[self::blockquote or self::aside or self::figure or (self::img and not(./ancestor::figure)) or self::iframe or self::slideshow or self::related or self::footer or self::table[not(ancestor::table) and not(descendant::table)]]
+ 
+  $problems: $test/self::*[ancestor::anchor or ancestor::blockquote[not(contains(@class,"instagram"))] or ancestor::aside or ancestor::footer or ancestor::strong or ancestor::b or ancestor::em or ancestor::i or ancestor::ins or ancestor::u or ancestor::del or ancestor::s or ancestor::strike or ancestor::code or ancestor::kbd or ancestor::samp or ancestor::tt or ancestor::mark or ancestor::sup or ancestor::pic or ancestor::sub or ancestor::a or ancestor::reference or ancestor::h1 or ancestor::h2 or ancestor::h3 or ancestor::h4 or ancestor::h5 or ancestor::h6 or ancestor::p or ancestor::pre or ancestor::hr or ancestor::img or ancestor::br]
+ 
+  @if( $problems ) {
+    $parent: $problems/parent::*
+    @detach: $parent/node()
+    @set_attr("merge", $index): $@
+    <remove>: $parent
+    @after_el("./parent::*"): $problems
+    @combine: $body//self::*[prev-sibling::*/@merge = @merge]
+  }
+}
+
+@unsupported: //a[has-class("gie-slideshow")]
