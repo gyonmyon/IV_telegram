@@ -26,25 +26,25 @@ Instant view Telegram contest 2019
 [Contest](https://instantview.telegram.org/contest/psychologytoday.com/winner2019) |
 [XPath Rule](psychologytoday.com.xpath)
 
-## <proagro.com.ua>
+## <http://proagro.com.ua>
 
 [Contest](https://instantview.telegram.org/contest/proagro.com.ua/winner2019) |
 [XPath Rule](proagro.com.ua.xpath)
 
-## <panram.ru>
+## <http://panram.ru>
 
 [Contest](https://instantview.telegram.org/contest/panram.ru/winner2019) |
 [XPath Rule](panram.ru.xpath)
 
-## <ruskline.ru>
+## <http://ruskline.ru>
 
 [Contest](https://instantview.telegram.org/contest/ruskline.ru/winner2019) |
 [XPath Rule](ruskline.ru.xpath)
 
-## <tourdom.ru>
+## <http://tourdom.ru>
 
 [Contest](https://instantview.telegram.org/contest/tourdom.ru/winner2019) |
 [XPath Rule](tourdom.ru.xpath)
 
-+Two different templates in 1 for subdomains
-+Repair VK-post
+Two different templates in 1 for subdomains
+Repair VK-post
