@@ -1,0 +1,63 @@
+~version: "2.0"
+
+#TITLE
+title: //h1[@class="blog_entry--full__title"]
+subtitle: //h2[@class="blog_entry--full__subtitle"]
+    @remove: //h2[@class="rteindent4"]
+
+#BODY
+?not_exists: //div[@class="node__content"]
+body: //div[@data-type="blog_entry"]
+body: //div[has-class("field-name-body field-type-text-with-summary field-label-hidden")]
+
+#COVER
+<figcaption>://div[@class="caption"]
+    <cite>: //div[@class="subtext insertArea--origin"]
+<figure>: //div[@class="insert-inner"]
+
+#AUTHIRS
+author: //h3[@class="profile_card__profile-name"]/a/text()
+  author_url: //h3[@class="profile_card__profile-name"]/a/@href
+
+author: //span[@class="field field-name-field-author field-type-entityreference field-label-hidden"]
+@replace("," ""): $$
+
+#DATE
+@datetime("MMMM dd yyyy"): //span[@class="date-display-single"]
+    published_date: $@
+
+@replace("Posted " ""): //p[@class="blog_entry--full__date fine-print"]/text()
+@datetime("MMM dd yyyy"): $@
+    published_date: $@
+
+<figcaption>: //div[@class="caption"]
+  @before_el($@): //figcaption//img
+
+#MEDIA
+@remove: //p[@class="blog_entry--full__date fine-print"]
+@remove: //div[@class="item-list"]
+@remove: //div[@class="__card-footer"]
+@remove: //div[@id="comments"]
+@remove: //p[@class="rteindent4"]
+
+@append_to("./prev-sibling::figcaption"): //cite
+
+#RELATED
+@remove: //div[@id="block-pt-blog-blog-author-bottom"]
+<related>: //div[@class="row region__content_bottom--block"]
+    @append_to($body): $$ 
+
+<reference>: //div[@class="blog-entry-references"]
+
+#LINK PREVIEW
+site_name: //meta[@property="og:site_name"]/@content
+
+?true
+$problems: $body
+@while( $problems ) {
+  $test: $body//*[self::audio or self::video or self::blockquote or self::aside or self::figure or (self::img and not(./ancestor::figure)) or self::iframe or self::slideshow or  self::related or self::footer or self::table[not(ancestor::table) and not(descendant::table)]]
+ 
+  $problems: $test/self::*[ancestor::anchor or ancestor::blockquote or ancestor::aside or ancestor::footer or ancestor::strong or ancestor::b or ancestor::em or ancestor::i or ancestor::ins or ancestor::u or ancestor::del or ancestor::s or ancestor::strike or ancestor::code or ancestor::kbd or ancestor::samp or ancestor::tt or ancestor::mark or ancestor::sup or ancestor::pic or ancestor::sub or ancestor::a or ancestor::reference or ancestor::h1 or ancestor::h2 or ancestor::h3 or ancestor::h4 or ancestor::h5 or ancestor::h6 or ancestor::p or ancestor::pre or ancestor::hr or ancestor::img or ancestor::br]
+ 
+  @split_parent: $problems
+}

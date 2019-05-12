@@ -20,3 +20,8 @@ Instant view Telegram contest 2019
 
 [Contest](https://instantview.telegram.org/contest/newdaynews.ru/winner2019) |
 [XPath Rule](newdaynews.ru.xpath)
+
+## <http://psychologytoday.com/>
+
+[Contest](https://instantview.telegram.org/contest/psychologytoday.com/winner2019) |
+[XPath Rule](psychologytoday.com.xpath)
